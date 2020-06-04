@@ -5,6 +5,7 @@ import com.codecool.books.model.AuthorDao;
 import com.codecool.books.view.UserInterface;
 
 import java.sql.Date;
+import java.sql.SQLException;
 
 public class AuthorManager extends Manager {
     AuthorDao authorDao;
@@ -15,7 +16,7 @@ public class AuthorManager extends Manager {
     }
 
     @Override
-    protected void add() {
+    protected void add() throws SQLException {
         String firstName = ui.readString("First name", "X");
         String lastName = ui.readString("Last name", "Y");
         Date birthDate = ui.readDate("Birth date", Date.valueOf("1900-01-01"));
@@ -28,14 +29,14 @@ public class AuthorManager extends Manager {
     }
 
     @Override
-    protected void list() {
+    protected void list() throws SQLException {
         for (Author author: authorDao.getAll()) {
             ui.println(author);
         }
     }
 
     @Override
-    protected void edit() {
+    protected void edit() throws SQLException {
         int id = ui.readInt("Author ID", 0);
         Author author = authorDao.get(id);
         if (author == null) {
