@@ -1,7 +1,6 @@
 package com.codecool.books.model;
 
 import javax.sql.DataSource;
-import javax.xml.crypto.Data;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,29 +34,39 @@ public class AuthorDaoJDBC implements AuthorDao {
     public void update(Author author) throws SQLException {
         // TODO
         Connection connection = dataSource.getConnection();
-        Statement statement = connection.createStatement();
         String sql;
-        sql = "UPDATE author SET first_name='"+author.getFirstName()+"',last_name='"+author.getLastName() +"',birth_date='"+author.getBirthDate()+"' WHERE id=1";
+        sql = "UPDATE author " + "SET first_name = ? , last_name = ?, birth_date = ?" + "WHERE ID = ?";
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.setString(1, author.getFirstName());
+        preparedStatement.setString(2,author.getLastName());
+        preparedStatement.setDate(3,author.getBirthDate());
+        preparedStatement.setInt(4,author.getId());
+        preparedStatement.executeUpdate();
 
-        statement.executeUpdate(sql);
-
-        statement.close();
+        preparedStatement.close();
         connection.close();
     }
 
     @Override
     public Author get(int id) throws SQLException {
-        // TODO
-//        Connection connection = dataSource.getConnection();
-//        Statement statement = connection.createStatement();
-//        String sql;
-//        sql = "SELETCT * from authors WHERE id=" +id;
-//        ResultSet resultSet = statement.executeQuery(sql);
-//        while (resultSet.next()){
-//            String firstName = resultSet.getString("first_name");
-//            System.out.println(firstName);
-//        }
-        return null;
+        // Done
+        Connection connection = dataSource.getConnection();
+        String sql = "SELECT * from author where id=?";
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.setInt(1,id);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        Author author = null;
+        while (resultSet.next()){
+            author = new Author(resultSet.getString("first_name"),resultSet.getString("last_name"),resultSet.getDate("birth_date"));
+            author.setId(resultSet.getInt("id"));
+        }
+
+
+        resultSet.close();
+        preparedStatement.close();
+        connection.close();
+
+        return author;
     }
 
     @Override
